@@ -1,0 +1,38 @@
+server:
+  port: 8763
+  tomcat:
+    uri-encoding: UTF-8
+  servlet:
+    session:
+      timeout: 600
+    context-path: @sms.root.path@
+
+spring:
+  application:
+    name: smsgateway
+
+  freemarker:
+    cache: true
+    settings:
+      auto_import: spring.ftl as S
+      number_format: '#'
+      template_update_delay: 0
+      default_encoding: UTF-8
+      datetime_format: yyyy-MM-dd HH:mm:ss
+      classic_compatible: true
+      template_exception_handler: ignore
+  mvc:
+    view:
+      prefix: /templates/
+      suffix: .ftl
+    static-path-pattern: /static/**
+
+sms:
+  in-development: @development.mode@
+  build-timestamp: @timestamp@
+  cookie-prefix: SMSG032_
+  encoding: UTF-8
+  server-encoding: ISO-8859-1
+  site-base: @sms.site.base@
+  root-path: @sms.root.path@
+  resource-path: @sms.resource.path@
