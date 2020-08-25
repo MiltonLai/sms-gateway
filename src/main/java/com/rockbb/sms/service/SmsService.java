@@ -31,12 +31,17 @@ public class SmsService {
         modemService.stop();
     }
 
+    public void start() {
+        modemService.start();
+    }
+
     public void stop() {
         modemService.stop();
     }
 
     public boolean send(SmsMessage sms) {
         if (!modemService.isReady()) {
+            logger.error("ModemService is not started");
             return false;
         }
         OutboundMessage outboundMessage = new OutboundMessage(sms.getRecipient(), sms.getContent());

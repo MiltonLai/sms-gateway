@@ -5,11 +5,8 @@ import com.rockbb.sms.bo.SmsMessage;
 import com.rockbb.sms.commons.JacksonUtils;
 import com.rockbb.sms.commons.SecureUtil;
 import com.rockbb.sms.service.SmsService;
-import com.rockbb.sms.vo.SmsMessageVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.smslib.InboundMessage;
-import org.smslib.OutboundMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
@@ -23,8 +20,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 @Controller
@@ -72,28 +67,11 @@ public class IndexApi {
         return "ok";
     }
 
-    @RequestMapping(value = "/inbound_list")
+    @RequestMapping(value = "/start")
     @ResponseBody
-    public String doInboundList(HttpServletRequest request, HttpServletResponse response) {
-        String strOffset = request.getParameter("offset");
-        String strLimit = request.getParameter("limit");
-        int offset = (strOffset == null)? 0 : Integer.parseInt(strOffset);
-        int limit = (strLimit == null)? 20 : Integer.parseInt(strLimit);
-        List<InboundMessage> messages = smsService.listInboundMessages(offset, limit);
-        List<SmsMessageVO> vos = adapt(messages);
-        return JacksonUtils.compressList(vos);
-    }
-
-    @RequestMapping(value = "/outbound_list")
-    @ResponseBody
-    public String doOutboundList(HttpServletRequest request, HttpServletResponse response) {
-        String strOffset = request.getParameter("offset");
-        String strLimit = request.getParameter("limit");
-        int offset = (strOffset == null)? 0 : Integer.parseInt(strOffset);
-        int limit = (strLimit == null)? 20 : Integer.parseInt(strLimit);
-        List<OutboundMessage> messages = smsService.listOutboundMessages(offset, limit);
-        List<SmsMessageVO> vos = adapt2(messages);
-        return JacksonUtils.compressList(vos);
+    public String doStart() {
+        smsService.start();
+        return "ok";
     }
 
     /**
@@ -114,56 +92,6 @@ public class IndexApi {
     }
     private String t(String code) {
         return messageSource.getMessage(code, null, code, Locale.SIMPLIFIED_CHINESE);
-    }
-
-    private static SmsMessageVO adapt(InboundMessage msg) {
-        if (msg == null) return null;
-        SmsMessageVO vo = new SmsMessageVO();
-        vo.setSender(msg.getOriginator());
-        vo.setRecipient(msg.getGatewayId());
-        if (msg.getMemLocation().equals("SR")) {
-            vo.setContent("Delivered Report");
-        } else {
-            vo.setContent(msg.getText());
-        }
-        vo.setDate(msg.getDate());
-        return vo;
-    }
-
-    private static List<SmsMessageVO> adapt(List<InboundMessage> msgs) {
-        if (msgs == null) return null;
-        List<SmsMessageVO> vos = new ArrayList<>();
-        for (InboundMessage msg : msgs) {
-            SmsMessageVO vo = adapt(msg);
-            if (vo != null) {
-                vos.add(vo);
-            }
-        }
-        return vos;
-    }
-
-    private static SmsMessageVO adapt2(OutboundMessage msg) {
-        if (msg == null) return null;
-        SmsMessageVO vo = new SmsMessageVO();
-        vo.setSender(msg.getGatewayId());
-        vo.setRecipient(msg.getRecipient());
-        vo.setContent(msg.getText());
-        vo.setDate(msg.getDate());
-        vo.setStatus(msg.getMessageStatus().name());
-        vo.setNote(msg.getFailureCause().name());
-        return vo;
-    }
-
-    private static List<SmsMessageVO> adapt2(List<OutboundMessage> msgs) {
-        if (msgs == null) return null;
-        List<SmsMessageVO> vos = new ArrayList<>();
-        for (OutboundMessage msg : msgs) {
-            SmsMessageVO vo = adapt2(msg);
-            if (vo != null) {
-                vos.add(vo);
-            }
-        }
-        return vos;
     }
 
 }

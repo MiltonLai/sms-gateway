@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0" 
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+    <localRepository/>
+    <interactiveMode/>
+    <offline/>
+    <pluginGroups/>
+    <proxies/>
+
+    <mirrors>
+      <mirror>
+        <id>nexus</id>
+        <mirrorOf>*</mirrorOf>
+        <name>Nexus Mirror.</name>
+        <url>http://qa.yihuicai.cn/nexus/content/groups/public/</url>
+      </mirror>
+    </mirrors>
+
+    <profiles>
+        <profile>
+            <id>sms_dev</id>
+            <properties>
+                <development.mode>1</development.mode>
+                <development.email>laimin@yihuicai.cn</development.email>
+                <developer>milton</developer>
+                <timestamp>${maven.build.timestamp}</timestamp>
+                <maven.build.timestamp.format>yyyyMMdd_HHmm</maven.build.timestamp.format>
+
+                <log.file.path>/home/milton/log</log.file.path>
+                <log.level>INFO</log.level>
+                <log.appender>stdout</log.appender>
+
+                <sms.root.path>/sms</sms.root.path>
+                <sms.site.base>http://127.0.0.1:8763</sms.site.base>
+                <sms.resource.path>/sms/static</sms.resource.path>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>sms_production</id>
+            <properties>
+                <development.mode>0</development.mode>
+                <development.email>laimin@yihuicai.cn</development.email>
+                <developer>milton</developer>
+                <timestamp>${maven.build.timestamp}</timestamp>
+                <maven.build.timestamp.format>yyyyMMdd_HHmm</maven.build.timestamp.format>
+
+                <log.file.path>/home/tomcat/logs</log.file.path>
+                <log.level>INFO</log.level>
+                <log.appender>file</log.appender>
+
+                <sms.root.path>/sms</sms.root.path>
+                <sms.site.base>http://192.168.23.38:8763</sms.site.base>
+                <sms.resource.path>/sms/static</sms.resource.path>
+            </properties>
+        </profile>
+    </profiles>
+
+    <activeProfiles>
+
+    </activeProfiles>
+</settings>

@@ -22,6 +22,7 @@ import org.smslib.queues.AbstractQueueManager;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -72,15 +73,26 @@ public class ModemService {
         for (SerialModemGateway gateway : modemGateways) {
             try{
                 logger.debug("Gateway: {}", gateway.getGatewayId());
-                logger.debug("  Manufacturer: {}", gateway.getManufacturer());
-                logger.debug("  Model: {}", gateway.getModel());
-                logger.debug("  Serial No: {}", gateway.getSerialNo());
-                logger.debug("  SIM IMSI: {}", gateway.getImsi());
-                logger.debug("  Signal Level: {}", gateway.getSignalLevel() + " dBm");
-                logger.debug("  Battery Level: {}", gateway.getBatteryLevel() + "%");
-            } catch (Exception e){
+                logger.debug("  Manufacturer/Model: {}, {}", gateway.getManufacturer(), gateway.getModel());
+                logger.debug("  Serial No: {}, IMSI: {}", gateway.getSerialNo(), gateway.getImsi());
+                logger.debug("  Signal:{}dBm, Battery:{}%", gateway.getSignalLevel(), gateway.getBatteryLevel());
+            } catch (Exception e) {
                 logger.error(e.getMessage(), e);
             }
+        }
+    }
+
+    synchronized public void start() {
+        if (ready) {
+            logger.error("ModemService is already started");
+        }
+        try {
+            logger.info("ModemService starting");
+            service.startService();
+            ready = true;
+            logger.info("ModemService started");
+        } catch (SMSLibException |IOException|InterruptedException e) {
+            logger.error(e.getMessage(), e);
         }
     }
 
@@ -170,10 +182,20 @@ public class ModemService {
         }
     }
 
+    public void fill_demo_data() {
+        OutboundMessage outboundMessage = new OutboundMessage("13800138000", System.currentTimeMillis()+ "" + Math.random());
+        outboundMessages.addFirst(outboundMessage);
+        outboundMessage = new OutboundMessage("13800138001", System.currentTimeMillis()+ "" + Math.random());
+        outboundMessages.addFirst(outboundMessage);
+
+        InboundMessage inboundMessage = new InboundMessage(new Date(), "13800138123", "test", 1, "SM");
+        inboundMessages.addFirst(inboundMessage);
+    }
+
     public static void main(String[] args) {
         ModemService modemService = new ModemService();
         modemService.init();
-        /*OutboundMessage msg = new OutboundMessage("13810291102", "English 中文短信内容, 中文短信内容，中文短信内容");
+        /*OutboundMessage msg = new OutboundMessage("13800138000", "English 中文短信内容, 中文短信内容，中文短信内容");
         boolean result = modemService.send(msg);
         logger.info("result {}", result);*/
         logger.info("Now Sleeping - Hit <enter> to terminate.");
